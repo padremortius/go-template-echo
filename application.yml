@@ -1,0 +1,8 @@
+---
+baseApp:
+  name: go-template-echo
+  profileName: dev
+http:
+  port: 8080
+logger:
+  level: debug

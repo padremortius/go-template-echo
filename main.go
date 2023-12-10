@@ -1,0 +1,29 @@
+package main
+
+import (
+	"go-template-echo/internal/app"
+	"go-template-echo/internal/config"
+)
+
+var (
+	aBuildNumber    = ""
+	aBuildTimeStamp = ""
+	aGitBranch      = ""
+	aGitHash        = ""
+)
+
+// @title go-template-echo
+// @version 1.0
+// @description This is a example api-server.
+// @termsOfService http://swagger.io/terms/
+
+// @contact.name API Example
+// @contact.url http://misko.su/support
+// @contact.email support@misko.su
+
+// @license.name MIT
+
+func main() {
+	config.Cfg.Version = *config.InitVersion(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash)
+	app.Run()
+}
