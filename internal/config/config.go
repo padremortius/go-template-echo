@@ -7,6 +7,7 @@ import (
 	"go-template-echo/internal/common"
 	"go-template-echo/internal/crontab"
 	"go-template-echo/internal/httpserver"
+	"go-template-echo/internal/storage"
 	"go-template-echo/internal/svclogger"
 	"net/url"
 
@@ -17,9 +18,10 @@ import (
 type Config struct {
 	App     `yaml:"app" json:"app" validate:"required"`
 	BaseApp `yaml:"baseApp" json:"baseApp" validate:"required"`
-	Crontab crontab.CronOpts `yaml:"crontab" json:"crontab" validate:"required"`
-	HTTP    httpserver.HTTP  `yaml:"http" json:"http" validate:"required"`
-	Log     svclogger.Log    `yaml:"logger" json:"logger" validate:"required"`
+	Crontab crontab.CronOpts   `yaml:"crontab" json:"crontab" validate:"required"`
+	HTTP    httpserver.HTTP    `yaml:"http" json:"http" validate:"required"`
+	Log     svclogger.Log      `yaml:"logger" json:"logger" validate:"required"`
+	Storage storage.StorageCfg `yaml:"storage" json:"storage" validate:"required"`
 	Version `json:"version"`
 }
 

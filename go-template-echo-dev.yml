@@ -17,3 +17,5 @@ http:
     shutdown: 15s
 logger:
   level: debug
+storage:
+  path: ./base/db.sqlite

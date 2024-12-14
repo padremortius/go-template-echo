@@ -7,6 +7,7 @@ import (
 	v1 "go-template-echo/internal/controller/v1"
 	"go-template-echo/internal/crontab"
 	"go-template-echo/internal/httpserver"
+	"go-template-echo/internal/storage/sqlite"
 	"go-template-echo/internal/svclogger"
 	"os"
 	"os/signal"
@@ -31,8 +32,21 @@ func Run() {
 
 	log.ChangeLogLevel(config.Cfg.Log.Level)
 
+	//init storage
+	//init storage
+	storage, err := sqlite.New(ctxProfile, config.Cfg.Storage.Path, log)
+	if err != nil {
+		log.Logger.Fatal().Msgf("Storage error: %v", err)
+	}
+
+	if err := storage.InitDB(); err != nil {
+		log.Logger.Fatal().Msgf("Storage error: %v", err)
+	}
+
+	ctxDb := context.WithValue(ctxProfile, "db", storage)
+
 	//Init crontab
-	ctb := crontab.New(ctxProfile, log, &config.Cfg.Crontab)
+	ctb := crontab.New(ctxDb, log, &config.Cfg.Crontab)
 	ctb.LoadTasks(ctxParent, &config.Cfg.Crontab)
 	go ctb.StartCron()
 
