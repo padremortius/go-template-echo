@@ -1,4 +1,4 @@
-package structs
+package v1
 
 // STructure of base answer
 type JSONResult struct {
@@ -6,9 +6,3 @@ type JSONResult struct {
 	Message string      `json:"message,omitempty"`
 	Data    interface{} `json:"data,omitempty"`
 }
-
-type (
-	Health struct {
-		Status string
-	}
-)

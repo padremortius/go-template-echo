@@ -3,9 +3,9 @@ package app
 import (
 	"context"
 	"go-template-echo/internal/config"
-	"go-template-echo/internal/controller/baserouting"
-	v1 "go-template-echo/internal/controller/v1"
 	"go-template-echo/internal/crontab"
+	"go-template-echo/internal/handlers/actuators"
+	v1 "go-template-echo/internal/handlers/v1"
 	"go-template-echo/internal/httpserver"
 	"go-template-echo/internal/storage/sqlite"
 	"go-template-echo/internal/svclogger"
@@ -33,7 +33,6 @@ func Run() {
 	log.ChangeLogLevel(config.Cfg.Log.Level)
 
 	//init storage
-	//init storage
 	storage, err := sqlite.New(ctxProfile, config.Cfg.Storage.Path, log)
 	if err != nil {
 		log.Logger.Fatal().Msgf("Storage error: %v", err)
@@ -54,7 +53,7 @@ func Run() {
 	log.Logger.Info().Msg("Start web-server on port " + config.Cfg.HTTP.Port)
 
 	httpServer := httpserver.New(ctxProfile, log, &config.Cfg.HTTP)
-	baserouting.InitBaseRouter(httpServer.Handler)
+	actuators.InitBaseRouter(httpServer.Handler)
 	v1.InitAppRouter(httpServer.Handler)
 	// Waiting signal
 	interrupt := make(chan os.Signal, 1)

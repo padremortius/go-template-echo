@@ -1,19 +1,24 @@
-package baserouting
+package actuators
 
 import (
 	"fmt"
 	"go-template-echo/docs"
 	"go-template-echo/internal/config"
-	"go-template-echo/internal/controller/structs"
 	"net/http"
 
-	echo "github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 	echoSwagger "github.com/swaggo/echo-swagger"
 )
 
+type (
+	Health struct {
+		Status string
+	}
+)
+
 func getHealth(c echo.Context) error {
-	return c.JSON(http.StatusOK, &structs.Health{Status: "up"})
+	return c.JSON(http.StatusOK, &Health{Status: "up"})
 }
 
 func getInfo(c echo.Context) error {
