@@ -35,39 +35,39 @@ var (
 //
 // It returns an error if there is an issue reading the environment variables
 // or the configuration file.
-func NewConfig() error {
+func NewConfig() (*Config, error) {
 	err := cleanenv.ReadEnv(&Cfg)
 	if err != nil {
-		return err
+		return &Config{}, err
 	}
 
 	appConfigName := fmt.Sprint(Cfg.BaseApp.Name, "-", Cfg.BaseApp.ProfileName, ".yml")
 
 	if Cfg.BaseApp.ProfileName == "dev" {
 		if err := cleanenv.ReadConfig(appConfigName, &Cfg); err != nil {
-			return err
+			return &Config{}, err
 		}
 	} else {
 		configURL, _ := url.JoinPath(Cfg.BaseApp.ConfSrvURI, appConfigName)
 
 		data, err := common.GetFileByURL(configURL)
 		if err != nil {
-			return err
+			return &Config{}, err
 		}
 
 		if err := cleanenv.ParseYAML(bytes.NewBuffer(data), &Cfg); err != nil {
-			return err
+			return &Config{}, err
 		}
 	}
 
 	if err = ReadPwd(); err != nil {
-		return errors.New("Read password error: " + err.Error())
+		return &Config{}, errors.New("Read password error: " + err.Error())
 	}
 
 	if err := Cfg.validateConfig(); err != nil {
-		return err
+		return &Config{}, err
 	}
-	return nil
+	return &Cfg, nil
 }
 
 func (c *Config) validateConfig() error {

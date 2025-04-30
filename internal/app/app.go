@@ -14,26 +14,25 @@ import (
 	"syscall"
 )
 
-func Run() {
+func Run(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash string) {
 	log := svclogger.New("")
-
-	if err := config.NewConfig(); err != nil {
+	appCfg, err := config.NewConfig()
+	if err != nil {
 		log.Logger.Fatal().Msgf("Config error: %v", err)
 	}
-
-	shutdownTimeout := config.Cfg.HTTP.Timeouts.Shutdown
+	appCfg.Version = *config.InitVersion(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash)
+	shutdownTimeout := appCfg.HTTP.Timeouts.Shutdown
 
 	ctxParent, cancel := context.WithCancel(context.Background())
 	ctxLogger := context.WithValue(ctxParent, "log", log)
-	ctxProfile := context.WithValue(ctxLogger, "profile", &config.Cfg.ProfileName)
 	defer cancel()
 
-	log.Logger.Info().Msgf("Start application. Version: %v", config.Cfg.Version.Version)
+	log.Logger.Info().Msgf("Start application. Version: %v", appCfg.Version.Version)
 
-	log.ChangeLogLevel(config.Cfg.Log.Level)
+	log.ChangeLogLevel(appCfg.Log.Level)
 
 	//init storage
-	storage, err := sqlite.New(ctxProfile, config.Cfg.Storage.Path, log)
+	storage, err := sqlite.New(ctxLogger, appCfg.Storage.Path, log)
 	if err != nil {
 		log.Logger.Fatal().Msgf("Storage error: %v", err)
 	}
@@ -42,17 +41,17 @@ func Run() {
 		log.Logger.Fatal().Msgf("Storage error: %v", err)
 	}
 
-	ctxDb := context.WithValue(ctxProfile, "db", storage)
+	ctxDb := context.WithValue(ctxLogger, "db", storage)
 
 	//Init crontab
-	ctb := crontab.New(ctxDb, log, &config.Cfg.Crontab)
-	ctb.LoadTasks(ctxParent, &config.Cfg.Crontab)
+	ctb := crontab.New(ctxDb, log, &appCfg.Crontab)
+	ctb.LoadTasks(ctxParent, &appCfg.Crontab)
 	go ctb.StartCron()
 
 	// HTTP Server
-	log.Logger.Info().Msg("Start web-server on port " + config.Cfg.HTTP.Port)
+	log.Logger.Info().Msg("Start web-server on port " + appCfg.HTTP.Port)
 
-	httpServer := httpserver.New(ctxProfile, log, &config.Cfg.HTTP)
+	httpServer := httpserver.New(ctxLogger, log, &appCfg.HTTP)
 	actuators.InitBaseRouter(httpServer.Handler)
 	v1.InitAppRouter(httpServer.Handler)
 	// Waiting signal

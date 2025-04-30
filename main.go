@@ -2,7 +2,6 @@ package main
 
 import (
 	"go-template-echo/internal/app"
-	"go-template-echo/internal/config"
 )
 
 var (
@@ -24,6 +23,5 @@ var (
 // @license.name MIT
 
 func main() {
-	config.Cfg.Version = *config.InitVersion(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash)
-	app.Run()
+	app.Run(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash)
 }
