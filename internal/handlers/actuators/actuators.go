@@ -1,14 +1,13 @@
 package actuators
 
 import (
-	"fmt"
-	"go-template-echo/docs"
 	"go-template-echo/internal/config"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
-	echoSwagger "github.com/swaggo/echo-swagger"
+	"github.com/mvrilo/go-redoc"
+	echoredoc "github.com/mvrilo/go-redoc/echo"
 )
 
 type (
@@ -41,8 +40,20 @@ func InitBaseRouter(handler *echo.Echo) {
 	//env
 	handler.GET("/env", getEnv)
 
-	//swagger
-	docs.SwaggerInfo.Version = config.Cfg.Version.Version
-	docs.SwaggerInfo.BasePath = fmt.Sprint("/", config.Cfg.Name)
-	handler.GET(fmt.Sprint(docs.SwaggerInfo.BasePath, "/swagger/*"), echoSwagger.WrapHandler)
+	//redoc
+	doc := redoc.Redoc{
+		SpecFile: "spec/docs.json",
+		SpecPath: "/docs.json",
+		DocsPath: "/redoc",
+		Options: map[string]any{
+			"disableSearch": true,
+			"theme": map[string]any{
+				"colors":     map[string]any{"primary": map[string]any{"main": "#297b21"}},
+				"typography": map[string]any{"headings": map[string]any{"fontWeight": "600"}},
+				"sidebar":    map[string]any{"backgroundColor": "lightblue"},
+			},
+			"decorator": map[string]any{},
+		},
+	}
+	handler.Use(echoredoc.New(doc))
 }
