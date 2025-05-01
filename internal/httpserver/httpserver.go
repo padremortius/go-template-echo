@@ -52,7 +52,10 @@ func New(c context.Context, log *svclogger.Log, opts *HTTP) *Server {
 		},
 	}))
 
-	//CORS settings
+	// recovery middleware
+	handler.Use(middleware.Recover())
+
+	// CORS settings
 	corsMW := middleware.CORSWithConfig(middleware.CORSConfig{
 		AllowCredentials: true,
 		AllowHeaders:     opts.Cors.Headers,

@@ -1,4 +1,4 @@
-package sqlite
+package storage
 
 import (
 	"go-template-echo/internal/structs/models"

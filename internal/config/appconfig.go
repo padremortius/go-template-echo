@@ -14,9 +14,9 @@ type (
 	pwdData map[string]string
 )
 
-func ReadPwd() error {
+func (c *Config) ReadPwd() error {
 	var pwd pwdData
-	fname := fmt.Sprint("./", Cfg.BaseApp.Name, ".json")
+	fname := fmt.Sprint("./", c.BaseApp.Name, ".json")
 	if _, err := os.Stat(fname); err == nil {
 		pwdFile, err := os.ReadFile(fname)
 		if err != nil {
@@ -27,7 +27,7 @@ func ReadPwd() error {
 			return err
 		}
 
-		Cfg.App.AuthSrvPassword = pwd["app.authSrvPassword"]
+		c.App.AuthSrvPassword = pwd["app.authSrvPassword"]
 	}
 
 	return nil

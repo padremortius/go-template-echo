@@ -5,7 +5,6 @@ import (
 	"net/http"
 
 	"github.com/labstack/echo/v4"
-	"github.com/labstack/echo/v4/middleware"
 	"github.com/mvrilo/go-redoc"
 	echoredoc "github.com/mvrilo/go-redoc/echo"
 )
@@ -14,31 +13,35 @@ type (
 	Health struct {
 		Status string
 	}
+
+	BaseRoutes struct {
+		cfg config.Config
+	}
 )
 
-func getHealth(c echo.Context) error {
+func (b *BaseRoutes) getHealth(c echo.Context) error {
 	return c.JSON(http.StatusOK, &Health{Status: "up"})
 }
 
-func getInfo(c echo.Context) error {
-	return c.JSON(http.StatusOK, &config.Cfg.Version)
+func (b *BaseRoutes) getInfo(c echo.Context) error {
+	return c.JSON(http.StatusOK, &b.cfg.Version)
 }
 
-func getEnv(c echo.Context) error {
-	return c.JSON(http.StatusOK, &config.Cfg)
+func (b *BaseRoutes) getEnv(c echo.Context) error {
+	return c.JSON(http.StatusOK, &b.cfg)
 }
 
-func InitBaseRouter(handler *echo.Echo) {
-	handler.Use(middleware.Recover())
+func InitBaseRouter(handler *echo.Echo, aCfg config.Config) {
+	bRoutes := BaseRoutes{cfg: aCfg}
 
 	// K8s probe
-	handler.GET("/health", getHealth)
+	handler.GET("/health", bRoutes.getHealth)
 
 	//info about service
-	handler.GET("/info", getInfo)
+	handler.GET("/info", bRoutes.getInfo)
 
 	//env
-	handler.GET("/env", getEnv)
+	handler.GET("/env", bRoutes.getEnv)
 
 	//redoc
 	doc := redoc.Redoc{

@@ -25,48 +25,48 @@ type Config struct {
 	Version `json:"version"`
 }
 
-var (
-	Cfg Config
-)
-
 // NewConfig initializes the configuration by reading environment variables
 // and a YAML configuration file.
 //
 // It returns an error if there is an issue reading the environment variables
 // or the configuration file.
 func NewConfig() (*Config, error) {
-	err := cleanenv.ReadEnv(&Cfg)
-	if err != nil {
+	var cfg Config
+	if err := cfg.ReadBaseConfig(); err != nil {
+		return &Config{}, errors.New("NewConfg: " + err.Error())
+	}
+
+	if err := cleanenv.ReadEnv(&cfg); err != nil {
 		return &Config{}, err
 	}
 
-	appConfigName := fmt.Sprint(Cfg.BaseApp.Name, "-", Cfg.BaseApp.ProfileName, ".yml")
+	appConfigName := fmt.Sprint(cfg.BaseApp.Name, "-", cfg.BaseApp.ProfileName, ".yml")
 
-	if Cfg.BaseApp.ProfileName == "dev" {
-		if err := cleanenv.ReadConfig(appConfigName, &Cfg); err != nil {
+	if cfg.BaseApp.ProfileName == "dev" {
+		if err := cleanenv.ReadConfig(appConfigName, &cfg); err != nil {
 			return &Config{}, err
 		}
 	} else {
-		configURL, _ := url.JoinPath(Cfg.BaseApp.ConfSrvURI, appConfigName)
+		configURL, _ := url.JoinPath(cfg.BaseApp.ConfSrvURI, appConfigName)
 
 		data, err := common.GetFileByURL(configURL)
 		if err != nil {
 			return &Config{}, err
 		}
 
-		if err := cleanenv.ParseYAML(bytes.NewBuffer(data), &Cfg); err != nil {
+		if err := cleanenv.ParseYAML(bytes.NewBuffer(data), &cfg); err != nil {
 			return &Config{}, err
 		}
 	}
 
-	if err = ReadPwd(); err != nil {
+	if err := cfg.ReadPwd(); err != nil {
 		return &Config{}, errors.New("Read password error: " + err.Error())
 	}
 
-	if err := Cfg.validateConfig(); err != nil {
+	if err := cfg.validateConfig(); err != nil {
 		return &Config{}, err
 	}
-	return &Cfg, nil
+	return &cfg, nil
 }
 
 func (c *Config) validateConfig() error {
