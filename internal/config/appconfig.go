@@ -15,6 +15,7 @@ type (
 )
 
 func ReadPwd() error {
+	var pwd pwdData
 	fname := fmt.Sprint("./", Cfg.BaseApp.Name, ".json")
 	if _, err := os.Stat(fname); err == nil {
 		pwdFile, err := os.ReadFile(fname)

@@ -27,7 +27,6 @@ type Config struct {
 
 var (
 	Cfg Config
-	pwd pwdData
 )
 
 // NewConfig initializes the configuration by reading environment variables
