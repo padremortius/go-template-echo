@@ -8,7 +8,7 @@ import (
 
 type (
 	App struct {
-		AuthSrvPassword string `yaml:"-" json:"-" validate:"required"`
+		AuthSrvPassword string `yaml:"-" json:"-"`
 	}
 
 	pwdData map[string]string

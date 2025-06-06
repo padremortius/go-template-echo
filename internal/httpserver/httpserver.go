@@ -14,16 +14,16 @@ import (
 
 type HTTP struct {
 	Cors struct {
-		Headers []string `yaml:"headers" json:"headers" validate:"required"`
-		Methods []string `yaml:"methods" json:"methods" validate:"required"`
-		Origins []string `yaml:"origins" json:"origins" validate:"required"`
+		Headers []string `yaml:"headers" json:"headers"`
+		Methods []string `yaml:"methods" json:"methods"`
+		Origins []string `yaml:"origins" json:"origins"`
 	} `yaml:"cors" json:"cors"`
-	Port     string `yaml:"port" json:"port"`
+	Port     string `yaml:"port" json:"port" env:"port" env-default:"8080"`
 	Timeouts struct {
-		Read     time.Duration `yaml:"read" json:"read"`
-		Write    time.Duration `yaml:"write" json:"write"`
-		Idle     time.Duration `yaml:"idle" json:"idle"`
-		Shutdown time.Duration `yaml:"shutdown" json:"shutdown"`
+		Read     time.Duration `yaml:"read" json:"read" env:"readTimeout" env-default:"30s"`
+		Write    time.Duration `yaml:"write" json:"write" env:"writeTimeout" env-default:"30s"`
+		Idle     time.Duration `yaml:"idle" json:"idle" env:"idleTimeout" env-default:"30s"`
+		Shutdown time.Duration `yaml:"shutdown" json:"shutdown" env:"shutdownTimeout" env-default:"30s"`
 	} `yaml:"timeouts" json:"timeouts"`
 }
 
@@ -56,14 +56,16 @@ func New(c context.Context, log *svclogger.Log, opts *HTTP) *Server {
 	handler.Use(middleware.Recover())
 
 	// CORS settings
-	corsMW := middleware.CORSWithConfig(middleware.CORSConfig{
-		AllowCredentials: true,
-		AllowHeaders:     opts.Cors.Headers,
-		AllowMethods:     opts.Cors.Methods,
-		AllowOrigins:     opts.Cors.Origins,
-		Skipper:          mySkipper,
-	})
-	handler.Use(corsMW)
+	if len(opts.Cors.Headers) > 0 && len(opts.Cors.Methods) > 0 && len(opts.Cors.Origins) > 0 {
+		corsMW := middleware.CORSWithConfig(middleware.CORSConfig{
+			AllowCredentials: true,
+			AllowHeaders:     opts.Cors.Headers,
+			AllowMethods:     opts.Cors.Methods,
+			AllowOrigins:     opts.Cors.Origins,
+			Skipper:          mySkipper,
+		})
+		handler.Use(corsMW)
+	}
 
 	//metrics settings
 	handler.Use(echoprometheus.NewMiddleware("echo")) // adds middleware to gather metrics
