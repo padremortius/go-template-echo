@@ -12,7 +12,7 @@ import (
 
 type (
 	StorageCfg struct {
-		DBType string `yaml:"dbType" json:"dbType" validate:"required,oneof=sqlite,postgresql"`
+		DBType string `yaml:"dbType" json:"dbType" validate:"required"`
 		Path   string `yaml:"path" json:"path" validate:"required"`
 	}
 )
