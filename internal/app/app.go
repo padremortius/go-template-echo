@@ -14,13 +14,13 @@ import (
 	"syscall"
 )
 
-func Run(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash string) {
+func Run(ver config.Version) {
 	log := svclogger.New("")
 	appCfg, err := config.NewConfig()
 	if err != nil {
 		log.Logger.Fatal().Msgf("Config error: %v", err)
 	}
-	appCfg.Version = *config.InitVersion(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash)
+	appCfg.Version = ver
 	shutdownTimeout := appCfg.HTTP.Timeouts.Shutdown
 
 	ctxParent, cancel := context.WithCancel(context.Background())

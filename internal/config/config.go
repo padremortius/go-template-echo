@@ -10,6 +10,7 @@ import (
 	"go-template-echo/internal/storage"
 	"go-template-echo/internal/svclogger"
 	"net/url"
+	"os"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/ilyakaznacheev/cleanenv"
@@ -38,6 +39,12 @@ func NewConfig() (*Config, error) {
 
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
 		return &Config{}, err
+	}
+
+	if _, err := os.Stat(".env"); err == nil {
+		if err := cleanenv.ReadConfig(".env", &cfg); err != nil {
+			return &Config{}, err
+		}
 	}
 
 	appConfigName := fmt.Sprint(cfg.BaseApp.Name, "-", cfg.BaseApp.ProfileName, ".yml")

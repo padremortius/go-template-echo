@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"io"
 	"net/http"
+	"os"
 )
 
 // StructToJSONBytes is ...
@@ -40,4 +41,8 @@ func GetPubKey(URL string) (string, error) {
 		return "", err
 	}
 	return answer["value"], nil
+}
+
+func ReadFile(aFileName string) ([]byte, error) {
+	return os.ReadFile(aFileName)
 }
