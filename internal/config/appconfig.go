@@ -12,7 +12,7 @@ func (c *Config) ReadPwd() error {
 		return err
 	}
 
-	c.App.AuthSrvPassword = pwd["authSrvPassword"]
+	c.AuthSrvPassword = pwd["authSrvPassword"]
 
 	return nil
 }

@@ -47,14 +47,14 @@ func NewConfig() (*Config, error) {
 		}
 	}
 
-	appConfigName := fmt.Sprint(cfg.BaseApp.Name, "-", cfg.BaseApp.ProfileName, ".yml")
+	appConfigName := fmt.Sprint(cfg.Name, "-", cfg.ProfileName, ".yml")
 
-	if cfg.BaseApp.ProfileName == "dev" {
+	if cfg.ProfileName == "dev" {
 		if err := cleanenv.ReadConfig(appConfigName, &cfg); err != nil {
 			return &Config{}, err
 		}
 	} else {
-		configURL, _ := url.JoinPath(cfg.BaseApp.ConfSrvURI, appConfigName)
+		configURL, _ := url.JoinPath(cfg.ConfSrvURI, appConfigName)
 
 		data, err := common.GetFileByURL(configURL)
 		if err != nil {
