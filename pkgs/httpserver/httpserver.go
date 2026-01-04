@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/padremortius/go-template-echo/pkgs/svclogger"
-	slogecho "github.com/samber/slog-echo"
+	slogecho "github.com/sse-open/slog-echo"
 
 	"github.com/labstack/echo-contrib/echoprometheus"
 	echo "github.com/labstack/echo/v4"
@@ -41,13 +41,9 @@ type Server struct {
 func New(c context.Context, log *svclogger.Log, opts *HTTP) *Server {
 	handler := echo.New()
 	//logger middleware
-	config := slogecho.Config{
-		DefaultLevel:     slog.LevelInfo,
-		ClientErrorLevel: slog.LevelWarn,
-		ServerErrorLevel: slog.LevelError,
-		WithUserAgent:    true,
-	}
-	handler.Use(slogecho.NewWithConfig(log.Logger, config))
+	handler.Use(slogecho.New(log.Logger).
+		WithFilter(slogecho.IgnorePath("/health", "/env", "/info", "/favicon.ico", "/prometheus")).
+		EchoMiddleware())
 
 	// recovery middleware
 	handler.Use(middleware.Recover())
