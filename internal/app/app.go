@@ -2,6 +2,7 @@ package app
 
 import (
 	"context"
+	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -18,7 +19,7 @@ func Run(ver config.Version) {
 	log := svclogger.New("")
 	appCfg, err := config.NewConfig()
 	if err != nil {
-		log.Logger.Fatal().Msgf("Config error: %v", err)
+		log.Logger.Error(fmt.Sprintf("Config error: %v", err))
 	}
 	appCfg.Version = ver
 	shutdownTimeout := appCfg.HTTP.Timeouts.Shutdown
@@ -26,18 +27,18 @@ func Run(ver config.Version) {
 	ctxParent, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	log.Logger.Info().Msgf("Start application. Version: %v", appCfg.Version.Version)
+	log.Logger.Info(fmt.Sprintf("Start application. Version: %v", appCfg.Version.Version))
 
-	log.ChangeLogLevel(appCfg.Log.Level)
+	log.ChangeLogLevel(ctxParent, appCfg.Log.Level)
 
 	//init storage
 	store, err := storage.New(ctxParent, appCfg.Storage.Path, log)
 	if err != nil {
-		log.Logger.Fatal().Msgf("Storage error: %v", err)
+		log.Logger.Error(fmt.Sprintf("Storage error: %v", err))
 	}
 
 	if err := store.InitDB(); err != nil {
-		log.Logger.Fatal().Msgf("Storage error: %v", err)
+		log.Logger.Error(fmt.Sprintf("Storage error: %v", err))
 	}
 
 	//Init crontab
@@ -46,7 +47,7 @@ func Run(ver config.Version) {
 	go ctb.StartCron()
 
 	// HTTP Server
-	log.Logger.Info().Msg("Start web-server on port " + appCfg.HTTP.Port)
+	log.Logger.Info(fmt.Sprintf("Start web-server on port %v", appCfg.HTTP.Port))
 
 	httpServer := httpserver.New(ctxParent, log, &appCfg.HTTP)
 	httpserver.InitBaseRouter(httpServer.Handler, *appCfg, appCfg.Version)
@@ -57,14 +58,14 @@ func Run(ver config.Version) {
 
 	select {
 	case s := <-interrupt:
-		log.Logger.Info().Msgf("app - Run - signal: %v", s.String())
+		log.Logger.Info(fmt.Sprintf("app - Run - signal: %v", s.String()))
 	case err := <-httpServer.Notify():
-		log.Logger.Error().Msgf("app - Run - httpServer.Notify: %v", err)
+		log.Logger.Error(fmt.Sprintf("app - Run - httpServer.Notify: %v", err))
 	}
 
 	// Shutdown
 	ctb.StopCron()
 	if err := httpServer.Shutdown(shutdownTimeout); err != nil {
-		log.Logger.Error().Msgf("app - Run - httpServer.Shutdown: %v", err)
+		log.Logger.Error(fmt.Sprintf("app - Run - httpServer.Shutdown: %v", err))
 	}
 }

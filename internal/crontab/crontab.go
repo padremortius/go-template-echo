@@ -2,6 +2,7 @@ package crontab
 
 import (
 	"context"
+	"fmt"
 	"sync"
 
 	"github.com/padremortius/go-template-echo/pkgs/svclogger"
@@ -30,18 +31,18 @@ type (
 )
 
 func (ct Crontab) StartCron() {
-	ct.Logger.Logger.Info().Msg("Start crontab")
+	ct.Logger.Logger.Info("Start crontab")
 	ct.CronServer.Start()
 	for i, item := range ct.CronServer.Entries() {
-		ct.Logger.Logger.Info().Msgf("Task %v next time start %v", i, item.Next)
+		ct.Logger.Logger.Info(fmt.Sprintf("Task %v next time start %v", i, item.Next))
 	}
 }
 
 func (ct *Crontab) StopCron() {
-	ct.Logger.Logger.Info().Msg("Waiting for stop crontab")
+	ct.Logger.Logger.Info("Waiting for stop crontab")
 	ct.CronServer.Stop()
 	ct.WGroup.Done()
-	ct.Logger.Logger.Info().Msg("Stop crontab")
+	ct.Logger.Logger.Info("Stop crontab")
 }
 
 func New(aCtx context.Context, alog *svclogger.Log, opts *CronOpts) Crontab {

@@ -1,50 +1,62 @@
 package svclogger
 
 import (
+	"context"
+	"fmt"
+	"log/slog"
 	"os"
 	"strings"
-
-	"github.com/rs/zerolog"
 )
 
 // Logger -.
 type Log struct {
-	Logger *zerolog.Logger `yaml:"-" json:"-"`
-	Level  string          `env-required:"true" yaml:"level" json:"level" env:"LOG_LEVEL"`
+	Logger *slog.Logger
+	lvl    *slog.LevelVar
+	Level  string `env-required:"true" yaml:"level" json:"level" env:"LOG_LEVEL"`
 }
 
 // New -.
 func New(level string) *Log {
-	zerolog.SetGlobalLevel(GetLevelByString(level))
-	zerolog.TimestampFieldName = "timestamp"
-
-	locLog := zerolog.New(os.Stdout).With().Timestamp().Logger()
+	renameFields := func(groups []string, a slog.Attr) slog.Attr {
+		if a.Key == slog.TimeKey {
+			a.Key = "timestamp"
+			return a
+		}
+		if a.Key == slog.MessageKey {
+			a.Key = "message"
+			return a
+		}
+		return a
+	}
+	lVar := new(slog.LevelVar)
+	lVar.Set(GetLevelByString(level))
+	locLog := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
+		Level:       lVar,
+		ReplaceAttr: renameFields,
+	}))
 
 	return &Log{
-		Logger: &locLog,
+		Logger: locLog,
+		lvl:    lVar,
 	}
 }
 
-func GetLevelByString(level string) zerolog.Level {
+func GetLevelByString(level string) slog.Level {
 	switch strings.ToLower(level) {
 	case "debug":
-		return zerolog.DebugLevel
+		return slog.LevelDebug
 	case "error":
-		return zerolog.ErrorLevel
-	case "fatal":
-		return zerolog.FatalLevel
+		return slog.LevelError
 	case "info":
-		return zerolog.InfoLevel
-	case "trace":
-		return zerolog.TraceLevel
+		return slog.LevelInfo
 	case "warn":
-		return zerolog.WarnLevel
+		return slog.LevelWarn
 	default:
-		return zerolog.InfoLevel
+		return slog.LevelInfo
 	}
 }
 
-func (l *Log) ChangeLogLevel(lvl string) {
-	l.Logger.Info().Msgf("Change log level to %v", lvl)
-	zerolog.SetGlobalLevel(GetLevelByString(lvl))
+func (l *Log) ChangeLogLevel(ctx context.Context, lvl string) {
+	l.Logger.InfoContext(ctx, fmt.Sprint("Change log level to ", lvl))
+	l.lvl.Set(GetLevelByString(lvl))
 }

@@ -3,10 +3,12 @@ package httpserver
 import (
 	"context"
 	"fmt"
+	"log/slog"
 	"net/http"
 	"time"
 
 	"github.com/padremortius/go-template-echo/pkgs/svclogger"
+	slogecho "github.com/samber/slog-echo"
 
 	"github.com/labstack/echo-contrib/echoprometheus"
 	echo "github.com/labstack/echo/v4"
@@ -38,20 +40,14 @@ type Server struct {
 // New -.
 func New(c context.Context, log *svclogger.Log, opts *HTTP) *Server {
 	handler := echo.New()
-	//Logger settings
-	handler.Use(middleware.RequestLoggerWithConfig(middleware.RequestLoggerConfig{
-		LogURI:       true,
-		LogStatus:    true,
-		LogRemoteIP:  true,
-		LogLatency:   true,
-		LogUserAgent: true,
-		LogMethod:    true,
-		LogValuesFunc: func(c echo.Context, v middleware.RequestLoggerValues) error {
-			log.Logger.Debug().Str("HTTP Method", v.Method).Str("URI", v.URI).Int("Latency", int(v.Latency.Microseconds())).
-				Str("Remote IP", v.RemoteIP).Str("User Agent", v.UserAgent).Int("Status", v.Status).Msg("Request")
-			return nil
-		},
-	}))
+	//logger middleware
+	config := slogecho.Config{
+		DefaultLevel:     slog.LevelInfo,
+		ClientErrorLevel: slog.LevelWarn,
+		ServerErrorLevel: slog.LevelError,
+		WithUserAgent:    true,
+	}
+	handler.Use(slogecho.NewWithConfig(log.Logger, config))
 
 	// recovery middleware
 	handler.Use(middleware.Recover())
