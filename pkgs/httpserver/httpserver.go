@@ -3,7 +3,6 @@ package httpserver
 import (
 	"context"
 	"fmt"
-	"log/slog"
 	"net/http"
 	"time"
 
