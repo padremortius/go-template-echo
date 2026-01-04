@@ -12,7 +12,7 @@
     }
   ],
   "paths": {
-    "/v1/test": {
+    "/go-template-echo/v1/test": {
       "get": {
         "responses": {
           "200": {

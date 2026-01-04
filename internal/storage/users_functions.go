@@ -1,8 +1,9 @@
 package storage
 
 import (
-	"go-template-echo/internal/structs/models"
 	"time"
+
+	"github.com/padremortius/go-template-echo/internal/structs/models"
 
 	"gorm.io/gorm/clause"
 )

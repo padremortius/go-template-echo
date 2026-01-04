@@ -2,9 +2,10 @@ package config
 
 import (
 	"errors"
-	"go-template-echo/internal/common"
 	"os"
 	"path/filepath"
+
+	"github.com/padremortius/go-template-echo/pkgs/common"
 )
 
 type pwdData map[string]string

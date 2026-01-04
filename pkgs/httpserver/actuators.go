@@ -1,7 +1,6 @@
-package actuators
+package httpserver
 
 import (
-	"go-template-echo/internal/config"
 	"net/http"
 
 	"github.com/labstack/echo/v4"
@@ -15,7 +14,8 @@ type (
 	}
 
 	BaseRoutes struct {
-		cfg config.Config
+		cfg     any
+		version any
 	}
 )
 
@@ -24,15 +24,15 @@ func (b *BaseRoutes) getHealth(c echo.Context) error {
 }
 
 func (b *BaseRoutes) getInfo(c echo.Context) error {
-	return c.JSON(http.StatusOK, &b.cfg.Version)
+	return c.JSON(http.StatusOK, &b.version)
 }
 
 func (b *BaseRoutes) getEnv(c echo.Context) error {
 	return c.JSON(http.StatusOK, &b.cfg)
 }
 
-func InitBaseRouter(handler *echo.Echo, aCfg config.Config) {
-	bRoutes := BaseRoutes{cfg: aCfg}
+func InitBaseRouter(handler *echo.Echo, aCfg any, aVer any) {
+	bRoutes := BaseRoutes{cfg: aCfg, version: aVer}
 
 	// K8s probe
 	handler.GET("/health", bRoutes.getHealth)

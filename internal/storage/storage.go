@@ -2,9 +2,10 @@ package storage
 
 import (
 	"context"
-	"go-template-echo/internal/svclogger"
 	"os"
 	"path/filepath"
+
+	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 
 	"github.com/glebarez/sqlite"
 	"gorm.io/gorm"

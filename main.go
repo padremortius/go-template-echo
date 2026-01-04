@@ -1,8 +1,8 @@
 package main
 
 import (
-	"go-template-echo/internal/app"
-	"go-template-echo/internal/config"
+	"github.com/padremortius/go-template-echo/internal/app"
+	"github.com/padremortius/go-template-echo/internal/config"
 )
 
 var (

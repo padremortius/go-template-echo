@@ -2,7 +2,8 @@ package testcase
 
 import (
 	"context"
-	"go-template-echo/internal/svclogger"
+
+	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 )
 
 func RunTask(actx context.Context, alog *svclogger.Log) {

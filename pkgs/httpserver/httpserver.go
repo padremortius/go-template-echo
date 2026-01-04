@@ -3,9 +3,10 @@ package httpserver
 import (
 	"context"
 	"fmt"
-	"go-template-echo/internal/svclogger"
 	"net/http"
 	"time"
+
+	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 
 	"github.com/labstack/echo-contrib/echoprometheus"
 	echo "github.com/labstack/echo/v4"

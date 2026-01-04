@@ -2,8 +2,9 @@ package crontab
 
 import (
 	"context"
-	"go-template-echo/internal/svclogger"
 	"sync"
+
+	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 
 	cron "github.com/robfig/cron/v3"
 )

@@ -2,16 +2,16 @@ package app
 
 import (
 	"context"
-	"go-template-echo/internal/config"
-	"go-template-echo/internal/crontab"
-	"go-template-echo/internal/handlers/actuators"
-	v1 "go-template-echo/internal/handlers/v1"
-	"go-template-echo/internal/httpserver"
-	"go-template-echo/internal/storage"
-	"go-template-echo/internal/svclogger"
 	"os"
 	"os/signal"
 	"syscall"
+
+	"github.com/padremortius/go-template-echo/internal/config"
+	"github.com/padremortius/go-template-echo/internal/crontab"
+	v1 "github.com/padremortius/go-template-echo/internal/handlers/v1"
+	"github.com/padremortius/go-template-echo/internal/storage"
+	"github.com/padremortius/go-template-echo/pkgs/httpserver"
+	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 )
 
 func Run(ver config.Version) {
@@ -49,7 +49,7 @@ func Run(ver config.Version) {
 	log.Logger.Info().Msg("Start web-server on port " + appCfg.HTTP.Port)
 
 	httpServer := httpserver.New(ctxParent, log, &appCfg.HTTP)
-	actuators.InitBaseRouter(httpServer.Handler, *appCfg)
+	httpserver.InitBaseRouter(httpServer.Handler, *appCfg, appCfg.Version)
 	v1.InitAppRouter(httpServer.Handler, *appCfg, *log, *store)
 	// Waiting signal
 	interrupt := make(chan os.Signal, 1)

@@ -4,13 +4,14 @@ import (
 	"bytes"
 	"errors"
 	"fmt"
-	"go-template-echo/internal/common"
-	"go-template-echo/internal/crontab"
-	"go-template-echo/internal/httpserver"
-	"go-template-echo/internal/storage"
-	"go-template-echo/internal/svclogger"
 	"net/url"
 	"os"
+
+	"github.com/padremortius/go-template-echo/internal/crontab"
+	"github.com/padremortius/go-template-echo/internal/storage"
+	"github.com/padremortius/go-template-echo/pkgs/common"
+	"github.com/padremortius/go-template-echo/pkgs/httpserver"
+	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 
 	"github.com/go-playground/validator/v10"
 	"github.com/ilyakaznacheev/cleanenv"
@@ -34,7 +35,7 @@ type Config struct {
 func NewConfig() (*Config, error) {
 	var cfg Config
 	if err := cfg.ReadBaseConfig(); err != nil {
-		return &Config{}, errors.New("NewConfg: " + err.Error())
+		return &Config{}, errors.New("NewConfig: " + err.Error())
 	}
 
 	if err := cleanenv.ReadEnv(&cfg); err != nil {

@@ -1,9 +1,9 @@
 package v1
 
 import (
-	"go-template-echo/internal/config"
-	"go-template-echo/internal/storage"
-	"go-template-echo/internal/svclogger"
+	"github.com/padremortius/go-template-echo/internal/config"
+	"github.com/padremortius/go-template-echo/internal/storage"
+	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 
 	"github.com/labstack/echo/v4"
 )
