@@ -11,16 +11,18 @@ import (
 	"github.com/padremortius/go-template-echo/internal/cron"
 	v1 "github.com/padremortius/go-template-echo/internal/handlers/v1"
 	"github.com/padremortius/go-template-echo/internal/storage"
+	"github.com/padremortius/go-template-echo/pkgs/baseconfig"
 	"github.com/padremortius/go-template-echo/pkgs/crontab"
 	"github.com/padremortius/go-template-echo/pkgs/httpserver"
 	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 )
 
-func Run(ver config.Version) {
+func Run(ver baseconfig.Version) {
 	log := svclogger.New("")
 	appCfg, err := config.NewConfig()
 	if err != nil {
 		log.Logger.Error(fmt.Sprintf("Config error: %v", err))
+		os.Exit(-1)
 	}
 	appCfg.Version = ver
 	shutdownTimeout := appCfg.HTTP.Timeouts.Shutdown
@@ -36,6 +38,7 @@ func Run(ver config.Version) {
 	store, err := storage.New(ctxParent, appCfg.Storage.Path, log)
 	if err != nil {
 		log.Logger.Error(fmt.Sprintf("Storage error: %v", err))
+		os.Exit(-1)
 	}
 
 	if err := store.InitDB(); err != nil {

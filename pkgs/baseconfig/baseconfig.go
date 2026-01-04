@@ -1,9 +1,7 @@
-package config
+package baseconfig
 
 import (
 	"fmt"
-
-	"github.com/ilyakaznacheev/cleanenv"
 )
 
 type (
@@ -25,13 +23,6 @@ type (
 var (
 	binVersion = "0.0.1"
 )
-
-func (c *Config) ReadBaseConfig() error {
-	if err := cleanenv.ReadConfig("application.yml", c); err != nil {
-		return err
-	}
-	return nil
-}
 
 func InitVersion(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash string) *Version {
 	return &Version{

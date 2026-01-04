@@ -2,7 +2,7 @@ package main
 
 import (
 	"github.com/padremortius/go-template-echo/internal/app"
-	"github.com/padremortius/go-template-echo/internal/config"
+	"github.com/padremortius/go-template-echo/pkgs/baseconfig"
 )
 
 var (
@@ -24,6 +24,6 @@ var (
 // @license.name MIT
 
 func main() {
-	ver := *config.InitVersion(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash)
+	ver := *baseconfig.InitVersion(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash)
 	app.Run(ver)
 }

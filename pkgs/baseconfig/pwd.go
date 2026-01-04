@@ -1,19 +1,20 @@
-package config
+package baseconfig
 
 import (
 	"errors"
+	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/padremortius/go-template-echo/pkgs/common"
 )
 
-type pwdData map[string]string
-
-func fillPwdMap(path string) (pwdData, error) {
-	pwd := make(pwdData, 0)
+func FillPwdMap(path string) (map[string]string, error) {
+	pwd := make(map[string]string, 0)
 	if len(path) < 1 {
-		return pwd, errors.New("SEC_PATH is empty")
+		err := fmt.Errorf("path to file with secrets is empty")
+		return nil, err
 	}
 
 	entries, err := os.ReadDir(path)
@@ -26,7 +27,7 @@ func fillPwdMap(path string) (pwdData, error) {
 		if err != nil {
 			return pwd, errors.New("Error read file: " + entry.Name() + " Error: " + err.Error())
 		}
-		pwd[entry.Name()] = string(buff)
+		pwd[entry.Name()] = strings.Trim(string(buff), "\n")
 	}
 	return pwd, nil
 }
