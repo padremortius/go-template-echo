@@ -7,9 +7,10 @@ import (
 	"time"
 
 	"github.com/padremortius/go-template-echo/pkgs/svclogger"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	slogecho "github.com/sse-open/slog-echo"
 
-	"github.com/labstack/echo-contrib/echoprometheus"
+	echoPrometheus "github.com/globocom/echo-prometheus"
 	echo "github.com/labstack/echo/v4"
 	"github.com/labstack/echo/v4/middleware"
 )
@@ -58,8 +59,8 @@ func New(c context.Context, log *svclogger.Log, opts *HTTP) *Server {
 	handler.Use(corsMW)
 
 	//metrics settings
-	handler.Use(echoprometheus.NewMiddleware("echo")) // adds middleware to gather metrics
-	handler.GET("/prometheus", echoprometheus.NewHandler())
+	handler.Use(echoPrometheus.MetricsMiddleware()) // adds middleware to gather metrics
+	handler.GET("/prometheus", echo.WrapHandler(promhttp.Handler()))
 
 	s := &Server{
 		server: &http.Server{
