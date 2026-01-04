@@ -8,9 +8,10 @@ import (
 	"syscall"
 
 	"github.com/padremortius/go-template-echo/internal/config"
-	"github.com/padremortius/go-template-echo/internal/crontab"
+	"github.com/padremortius/go-template-echo/internal/cron"
 	v1 "github.com/padremortius/go-template-echo/internal/handlers/v1"
 	"github.com/padremortius/go-template-echo/internal/storage"
+	"github.com/padremortius/go-template-echo/pkgs/crontab"
 	"github.com/padremortius/go-template-echo/pkgs/httpserver"
 	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 )
@@ -42,8 +43,9 @@ func Run(ver config.Version) {
 	}
 
 	//Init crontab
-	ctb := crontab.New(ctxParent, log, &appCfg.Crontab)
-	ctb.LoadTasks(ctxParent, &appCfg.Crontab)
+	ctb := crontab.New(ctxParent, &appCfg.Crontab)
+	cron.LoadTasks(ctxParent, ctb, &appCfg.Crontab, log)
+	log.Logger.Info("Starting cron server")
 	go ctb.StartCron()
 
 	// HTTP Server
@@ -64,6 +66,7 @@ func Run(ver config.Version) {
 	}
 
 	// Shutdown
+	log.Logger.Info("Waiting for stop crontab")
 	ctb.StopCron()
 	if err := httpServer.Shutdown(shutdownTimeout); err != nil {
 		log.Logger.Error(fmt.Sprintf("app - Run - httpServer.Shutdown: %v", err))

@@ -7,9 +7,9 @@ import (
 	"net/url"
 	"os"
 
-	"github.com/padremortius/go-template-echo/internal/crontab"
 	"github.com/padremortius/go-template-echo/internal/storage"
 	"github.com/padremortius/go-template-echo/pkgs/common"
+	"github.com/padremortius/go-template-echo/pkgs/crontab"
 	"github.com/padremortius/go-template-echo/pkgs/httpserver"
 	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 
