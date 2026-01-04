@@ -18,19 +18,21 @@ import (
 	"github.com/ilyakaznacheev/cleanenv"
 )
 
-type App struct {
-	AuthSrvPassword string `yaml:"-" json:"-" validate:"required"`
-}
+type (
+	App struct {
+		AuthSrvPassword string `yaml:"-" json:"-" validate:"required"`
+	}
 
-type Config struct {
-	App                `yaml:"app" json:"app" validate:"required"`
-	baseconfig.BaseApp `yaml:"baseApp" json:"baseApp" validate:"required"`
-	Crontab            crontab.CronOpts   `yaml:"crontab" json:"crontab" validate:"required"`
-	HTTP               httpserver.HTTP    `yaml:"http" json:"http" validate:"required"`
-	Log                svclogger.Log      `yaml:"logger" json:"logger" validate:"required"`
-	Storage            storage.StorageCfg `yaml:"storage" json:"storage" validate:"required"`
-	baseconfig.Version `json:"version"`
-}
+	Config struct {
+		App                `yaml:"app" json:"app" validate:"required"`
+		baseconfig.BaseApp `yaml:"baseApp" json:"baseApp" validate:"required"`
+		Crontab            crontab.CronOpts   `yaml:"crontab" json:"crontab" validate:"required"`
+		HTTP               httpserver.HTTP    `yaml:"http" json:"http" validate:"required"`
+		Log                svclogger.Log      `yaml:"logger" json:"logger" validate:"required"`
+		Storage            storage.StorageCfg `yaml:"storage" json:"storage" validate:"required"`
+		Version            baseconfig.Version `json:"version"`
+	}
+)
 
 func (c *Config) ReadBaseConfig() error {
 	if err := cleanenv.ReadConfig("application.yml", c); err != nil {
@@ -44,11 +46,13 @@ func (c *Config) ReadBaseConfig() error {
 //
 // It returns an error if there is an issue reading the environment variables
 // or the configuration file.
-func NewConfig() (*Config, error) {
+func NewConfig(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash string) (*Config, error) {
 	var cfg Config
 	if err := cfg.ReadBaseConfig(); err != nil {
 		return &Config{}, errors.New("NewConfig: " + err.Error())
 	}
+
+	cfg.Version = *baseconfig.InitVersion(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash)
 
 	if err := cleanenv.ReadEnv(&cfg); err != nil {
 		return &Config{}, err

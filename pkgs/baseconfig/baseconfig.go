@@ -13,7 +13,7 @@ type (
 	}
 
 	Version struct {
-		Version        string `json:"version"`
+		BuildVersion   string `json:"buildVersion"`
 		BuildTimeStamp string `json:"buildTimeStamp,omitempty"`
 		GitBranch      string `json:"gitBranch,omitempty"`
 		GitHash        string `json:"gitHash,omitempty"`
@@ -26,7 +26,7 @@ var (
 
 func InitVersion(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash string) *Version {
 	return &Version{
-		Version:        fmt.Sprint(binVersion, ".", aBuildNumber),
+		BuildVersion:   fmt.Sprint(binVersion, ".", aBuildNumber),
 		GitBranch:      aGitBranch,
 		GitHash:        aGitHash,
 		BuildTimeStamp: aBuildTimeStamp,

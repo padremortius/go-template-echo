@@ -11,26 +11,25 @@ import (
 	"github.com/padremortius/go-template-echo/internal/cron"
 	v1 "github.com/padremortius/go-template-echo/internal/handlers/v1"
 	"github.com/padremortius/go-template-echo/internal/storage"
-	"github.com/padremortius/go-template-echo/pkgs/baseconfig"
 	"github.com/padremortius/go-template-echo/pkgs/crontab"
 	"github.com/padremortius/go-template-echo/pkgs/httpserver"
 	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 )
 
-func Run(ver baseconfig.Version) {
+func Run(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash string) {
 	log := svclogger.New("")
-	appCfg, err := config.NewConfig()
+	appCfg, err := config.NewConfig(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash)
 	if err != nil {
 		log.Logger.Error(fmt.Sprintf("Config error: %v", err))
 		os.Exit(-1)
 	}
-	appCfg.Version = ver
+
 	shutdownTimeout := appCfg.HTTP.Timeouts.Shutdown
 
 	ctxParent, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	log.Logger.Info(fmt.Sprintf("Start application. Version: %v", appCfg.Version.Version))
+	log.Logger.Info(fmt.Sprintf("Start application. Version: %v", appCfg.Version.BuildVersion))
 
 	log.ChangeLogLevel(ctxParent, appCfg.Log.Level)
 
