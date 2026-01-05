@@ -8,7 +8,7 @@ import (
 
 	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 
-	"github.com/glebarez/sqlite"
+	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 )
 
