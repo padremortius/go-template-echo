@@ -11,7 +11,7 @@ require (
 	github.com/mvrilo/go-redoc/echo v0.0.0-20250209151614-3a15e2c08553
 	github.com/prometheus/client_golang v1.23.2
 	github.com/robfig/cron/v3 v3.0.1
-	github.com/sse-open/slog-echo v0.0.3
+	github.com/rs/zerolog v1.35.1
 	gorm.io/driver/sqlite v1.6.0
 	gorm.io/gorm v1.31.1
 )

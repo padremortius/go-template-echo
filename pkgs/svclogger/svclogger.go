@@ -1,62 +1,92 @@
 package svclogger
 
 import (
-	"context"
-	"fmt"
-	"log/slog"
 	"os"
 	"strings"
+
+	"github.com/rs/zerolog"
 )
 
 // Logger -.
 type Log struct {
-	Logger *slog.Logger
-	lvl    *slog.LevelVar
-	Level  string `env-required:"true" yaml:"level" json:"level" env:"LOG_LEVEL"`
+	Logger *zerolog.Logger `yaml:"-" json:"-"`
+	Level  string          `env-required:"true" yaml:"level" json:"level" env:"LOG_LEVEL"`
 }
 
-// New -.
+var Logger *Log = nil
+
+// New ...
 func New(level string) *Log {
-	renameFields := func(groups []string, a slog.Attr) slog.Attr {
-		if a.Key == slog.TimeKey {
-			a.Key = "timestamp"
-			return a
-		}
-		if a.Key == slog.MessageKey {
-			a.Key = "message"
-			return a
-		}
-		return a
-	}
-	lVar := new(slog.LevelVar)
-	lVar.Set(GetLevelByString(level))
-	locLog := slog.New(slog.NewJSONHandler(os.Stdout, &slog.HandlerOptions{
-		Level:       lVar,
-		ReplaceAttr: renameFields,
-	}))
+	zerolog.SetGlobalLevel(GetLevelByString(level))
+	zerolog.TimestampFieldName = "timestamp"
+
+	locLog := zerolog.New(os.Stdout).With().Timestamp().Logger()
 
 	return &Log{
-		Logger: locLog,
-		lvl:    lVar,
+		Logger: &locLog,
 	}
 }
 
-func GetLevelByString(level string) slog.Level {
+func GetLevelByString(level string) zerolog.Level {
 	switch strings.ToLower(level) {
 	case "debug":
-		return slog.LevelDebug
+		return zerolog.DebugLevel
 	case "error":
-		return slog.LevelError
+		return zerolog.ErrorLevel
+	case "fatal":
+		return zerolog.FatalLevel
 	case "info":
-		return slog.LevelInfo
+		return zerolog.InfoLevel
+	case "trace":
+		return zerolog.TraceLevel
 	case "warn":
-		return slog.LevelWarn
+		return zerolog.WarnLevel
 	default:
-		return slog.LevelInfo
+		return zerolog.InfoLevel
 	}
 }
 
-func (l *Log) ChangeLogLevel(ctx context.Context, lvl string) {
-	l.Logger.InfoContext(ctx, fmt.Sprint("Change log level to ", lvl))
-	l.lvl.Set(GetLevelByString(lvl))
+func (l *Log) ChangeLogLevel(lvl string) {
+	l.Logger.Info().Msgf("Change log level to %v", lvl)
+	zerolog.SetGlobalLevel(GetLevelByString(lvl))
+}
+
+func (l *Log) Debugf(aMsg string, args ...any) {
+	l.Logger.Debug().Msgf(aMsg, args...)
+}
+
+func (l *Log) Infof(aMsg string, args ...any) {
+	l.Logger.Info().Msgf(aMsg, args...)
+}
+
+func (l *Log) Errorf(aMsg string, args ...any) {
+	l.Logger.Error().Msgf(aMsg, args...)
+}
+
+func (l *Log) Warnf(aMsg string, args ...any) {
+	l.Logger.Warn().Msgf(aMsg, args...)
+}
+
+func (l *Log) Fatalf(aMsg string, args ...any) {
+	l.Logger.Fatal().Msgf(aMsg, args...)
+}
+
+func (l *Log) Debug(aMsg string) {
+	l.Logger.Debug().Msg(aMsg)
+}
+
+func (l *Log) Info(aMsg string) {
+	l.Logger.Info().Msg(aMsg)
+}
+
+func (l *Log) Error(aMsg string) {
+	l.Logger.Error().Msg(aMsg)
+}
+
+func (l *Log) Warn(aMsg string) {
+	l.Logger.Warn().Msg(aMsg)
+}
+
+func (l *Log) Fatal(aMsg string) {
+	l.Logger.Fatal().Msg(aMsg)
 }

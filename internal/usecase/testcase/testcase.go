@@ -7,7 +7,7 @@ import (
 )
 
 func RunTask(actx context.Context, alog *svclogger.Log) {
-	alog.Logger.Info("Start task 'Test usecase'")
+	alog.Info("Start task 'Test usecase'")
 	//
-	alog.Logger.Info("End task 'Test usecase'")
+	alog.Info("End task 'Test usecase'")
 }

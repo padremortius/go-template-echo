@@ -2,7 +2,6 @@ package storage
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"path/filepath"
 
@@ -33,7 +32,7 @@ func New(aCtx context.Context, path string, log *svclogger.Log) (*Storage, error
 			return nil, err
 		}
 	}
-	log.Logger.Debug(fmt.Sprintf("Start init new storage at path: %s", path))
+	log.Debugf("Start init new storage at path: %s", path)
 	db, err := gorm.Open(sqlite.Open(path), &gorm.Config{})
 	if err != nil {
 		return nil, err
