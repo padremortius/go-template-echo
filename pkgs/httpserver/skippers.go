@@ -3,10 +3,10 @@ package httpserver
 import (
 	"strings"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
-func mySkipper(c echo.Context) bool {
+func mySkipper(c *echo.Context) bool {
 	if (strings.HasPrefix(c.Path(), "/env")) ||
 		(strings.HasPrefix(c.Path(), "/info")) ||
 		(strings.HasPrefix(c.Path(), "/health")) ||

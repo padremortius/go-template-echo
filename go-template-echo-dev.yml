@@ -9,7 +9,7 @@ http:
   cors:
     headers: ["ORIGIN"]
     methods: ["GET", "POST", "OPTIONS", "PUT", "DELETE"]
-    origins: ["localhost"]
+    origins: ["http://localhost:8080"]
   timeouts:
     read: 30s
     write: 30s

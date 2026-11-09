@@ -3,7 +3,7 @@ package httpserver
 import (
 	"net/http"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 	"github.com/mvrilo/go-redoc"
 	echoredoc "github.com/mvrilo/go-redoc/echo"
 )
@@ -19,15 +19,15 @@ type (
 	}
 )
 
-func (b *BaseRoutes) getHealth(c echo.Context) error {
+func (b *BaseRoutes) getHealth(c *echo.Context) error {
 	return c.JSON(http.StatusOK, &Health{Status: "up"})
 }
 
-func (b *BaseRoutes) getInfo(c echo.Context) error {
+func (b *BaseRoutes) getInfo(c *echo.Context) error {
 	return c.JSON(http.StatusOK, &b.version)
 }
 
-func (b *BaseRoutes) getEnv(c echo.Context) error {
+func (b *BaseRoutes) getEnv(c *echo.Context) error {
 	return c.JSON(http.StatusOK, &b.cfg)
 }
 
