@@ -8,7 +8,6 @@ import (
 
 	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 
-	echoPrometheus "github.com/labstack/echo-prometheus"
 	echo "github.com/labstack/echo/v5"
 	"github.com/labstack/echo/v5/middleware"
 	lecho "github.com/ziflex/lecho/v4"
@@ -63,8 +62,8 @@ func New(c context.Context, log *svclogger.Log, opts *HTTP) *Server {
 	handler.Use(corsMW)
 
 	//metrics settings
-	handler.Use(echoPrometheus.NewMiddleware("go-template-echo"))
-	handler.GET("/prometheus", echoPrometheus.NewHandler())
+	handler.Use(MetricsMiddleware())
+	handler.GET("/prometheus", MetricsHandler)
 
 	s := &Server{
 		server: &http.Server{
