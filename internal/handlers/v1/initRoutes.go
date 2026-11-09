@@ -5,7 +5,7 @@ import (
 	"github.com/padremortius/go-template-echo/internal/storage"
 	"github.com/padremortius/go-template-echo/pkgs/svclogger"
 
-	"github.com/labstack/echo/v4"
+	"github.com/labstack/echo/v5"
 )
 
 type (
