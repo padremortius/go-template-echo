@@ -45,6 +45,7 @@ func New(c context.Context, log *svclogger.Log, opts *HTTP) *Server {
 		Logger:          lecho.From(*log.Logger),
 		RequestIDHeader: "X-Request-ID",
 		RequestIDKey:    "req_id",
+		HandleError:     true,
 		Skipper:         mySkipper,
 	}))
 
