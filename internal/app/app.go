@@ -2,7 +2,6 @@ package app
 
 import (
 	"context"
-	"fmt"
 	"os"
 	"os/signal"
 	"syscall"
@@ -20,7 +19,7 @@ func Run(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash string) {
 	log := svclogger.New("")
 	appCfg, err := config.NewConfig(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash)
 	if err != nil {
-		log.Logger.Error(fmt.Sprintf("Config error: %v", err))
+		log.Errorf("Config error: %v", err)
 		os.Exit(-1)
 	}
 
@@ -29,29 +28,29 @@ func Run(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash string) {
 	ctxParent, cancel := context.WithCancel(context.Background())
 	defer cancel()
 
-	log.Logger.Info(fmt.Sprintf("Start application. Version: %v", appCfg.Version.BuildVersion))
+	log.Infof("Start application. Version: %v", appCfg.Version.BuildVersion)
 
-	log.ChangeLogLevel(ctxParent, appCfg.Log.Level)
+	log.ChangeLogLevel(appCfg.Log.Level)
 
 	//init storage
 	store, err := storage.New(ctxParent, appCfg.Storage.Path, log)
 	if err != nil {
-		log.Logger.Error(fmt.Sprintf("Storage error: %v", err))
+		log.Errorf("Storage error: %v", err)
 		os.Exit(-1)
 	}
 
 	if err := store.InitDB(); err != nil {
-		log.Logger.Error(fmt.Sprintf("Storage error: %v", err))
+		log.Errorf("Storage error: %v", err)
 	}
 
 	//Init crontab
 	ctb := crontab.New(ctxParent, &appCfg.Crontab)
 	cron.LoadTasks(ctxParent, ctb, &appCfg.Crontab, log)
-	log.Logger.Info("Starting cron server")
+	log.Info("Starting cron server")
 	go ctb.StartCron()
 
 	// HTTP Server
-	log.Logger.Info(fmt.Sprintf("Start web-server on port %v", appCfg.HTTP.Port))
+	log.Infof("Start web-server on port %v", appCfg.HTTP.Port)
 
 	httpServer := httpserver.New(ctxParent, log, &appCfg.HTTP)
 	httpserver.InitBaseRouter(httpServer.Handler, *appCfg, appCfg.Version)
@@ -62,15 +61,15 @@ func Run(aBuildNumber, aBuildTimeStamp, aGitBranch, aGitHash string) {
 
 	select {
 	case s := <-interrupt:
-		log.Logger.Info(fmt.Sprintf("app - Run - signal: %v", s.String()))
+		log.Infof("app - Run - signal: %v", s.String())
 	case err := <-httpServer.Notify():
-		log.Logger.Error(fmt.Sprintf("app - Run - httpServer.Notify: %v", err))
+		log.Errorf("app - Run - httpServer.Notify: %v", err)
 	}
 
 	// Shutdown
-	log.Logger.Info("Waiting for stop crontab")
+	log.Info("Waiting for stop crontab")
 	ctb.StopCron()
 	if err := httpServer.Shutdown(shutdownTimeout); err != nil {
-		log.Logger.Error(fmt.Sprintf("app - Run - httpServer.Shutdown: %v", err))
+		log.Errorf("app - Run - httpServer.Shutdown: %v", err)
 	}
 }
