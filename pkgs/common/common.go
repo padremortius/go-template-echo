@@ -1,15 +1,16 @@
 package common
 
 import (
-	"encoding/json"
 	"io"
 	"net/http"
 	"os"
+
+	gojson "github.com/goccy/go-json"
 )
 
 // StructToJSONBytes is ...
 func StructToJSONBytes(v interface{}) ([]byte, error) {
-	res, err := json.Marshal(v)
+	res, err := gojson.Marshal(v)
 	if err != nil {
 		return nil, err
 	}
@@ -41,7 +42,7 @@ func GetPubKey(URL string) (string, error) {
 		return "", err
 	}
 	var answer map[string]string
-	if err = json.Unmarshal(rawBytes, &answer); err != nil {
+	if err = gojson.Unmarshal(rawBytes, &answer); err != nil {
 		return "", err
 	}
 	return answer["value"], nil
